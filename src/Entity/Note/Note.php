@@ -33,14 +33,6 @@ class Note
     }
 
     /**
-     * @param int $id
-     */
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return string
      */
     public function getMessage(): string
@@ -49,26 +41,10 @@ class Note
     }
 
     /**
-     * @param string $message
-     */
-    public function setMessage(string $message): void
-    {
-        $this->message = $message;
-    }
-
-    /**
      * @return Author
      */
     public function getAuthor(): Author
     {
         return $this->author;
-    }
-
-    /**
-     * @param Author $author
-     */
-    public function setAuthor(Author $author): void
-    {
-        $this->author = $author;
     }
 }

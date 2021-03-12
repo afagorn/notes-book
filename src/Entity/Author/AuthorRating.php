@@ -23,8 +23,8 @@ class AuthorRating
      */
     public function setValue(int $value): void
     {
-        if($value > 5 | $value < 0) {
-            throw new \InvalidArgumentException('AuthorRating must be between 0 and 5');
+        if($value > 5 || $value < 0) {
+            throw new \InvalidArgumentException('AuthorRating must be between 1 and 5');
         }
 
         $this->value = $value;
