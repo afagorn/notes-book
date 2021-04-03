@@ -1,13 +1,21 @@
 <?php
+declare(strict_types=1);
 
 namespace core\Request;
 
+use core\Route\HTTPMethod;
+use JetBrains\PhpStorm\Pure;
+
+/**
+ * Class Request
+ * @package core\Request
+ */
 class Request implements IRequest
 {
     /**
-     * @var string
+     * @var HTTPMethod
      */
-    private string $method;
+    private HTTPMethod $HTTPMethod;
 
     /**
      * Содержит POST данные или если их нет, то GET
@@ -18,63 +26,60 @@ class Request implements IRequest
     /**
      * @var array
      */
-    private array $parsedQuery;
-
-    /**
-     * @var array
-     */
     private array $parsedPost;
 
     /**
-     * @var string
-     */
-    private string $url;
-
-    /**
      * @var array
      */
-    private array $parsedUrl;
+    private array $parsedQuery;
 
     /**
-     *
+     * @var Url
      */
-    public function init()
-    {
-        $this->setMethod();
-        $this->setUrl();
-        $this->setParsedUrl();
+    private Url $url;
 
-        $this->setParsedPost();
-        $this->setParsedQuery();
-        $this->setParsedBody();
+    /**
+     * @return void
+     */
+    public function init(): void
+    {
+        $this->HTTPMethod = $this->setHTTPMethod();
+        $this->url = $this->makeUrl();
+        $this->parsedPost = $this->parsePost();
+        $this->parsedQuery = $this->parseQuery();
+        $this->parsedBody = $this->parseBody();
     }
 
     /**
-     *
+     * @return HTTPMethod
      */
-    private function setMethod(): void
+    private function setHTTPMethod(): HTTPMethod
     {
-        $this->method = mb_strtolower(trim($_SERVER['REQUEST_METHOD']));
+        return new HTTPMethod(
+            mb_strtolower(trim($_SERVER['REQUEST_METHOD']))
+        );
     }
 
     /**
-     *
+     * @return Url
      */
-    private function setUrl()
+    private function makeUrl(): Url
     {
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-        $this->url = sprintf(
+        $url = sprintf(
             '%s://%s%s',
             $protocol,
             $_SERVER['HTTP_HOST'],
             $_SERVER['REQUEST_URI']
         );
+
+        return new Url($url);
     }
 
     /**
-     *
+     * @return array
      */
-    private function setParsedPost()
+    private function parsePost(): array
     {
         $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
 
@@ -87,13 +92,13 @@ class Request implements IRequest
             }
         }
 
-        $this->parsedPost = $post;
+        return $post;
     }
 
     /**
-     *
+     * @return array
      */
-    private function setParsedQuery()
+    #[Pure] private function parseQuery(): array
     {
         $query = filter_input_array(INPUT_GET, FILTER_SANITIZE_SPECIAL_CHARS);
 
@@ -101,31 +106,19 @@ class Request implements IRequest
             $query = [];
         }
 
-        $this->parsedQuery = $query;
+        return $query;
     }
 
     /**
-     *
+     * @return array
      */
-    private function setParsedBody()
+    private function parseBody(): array
     {
-        if(empty($body = $this->parsedPost)) {
-            $body = $this->parsedQuery;
+        if(empty($parsedBody = $this->parsedPost)) {
+            $parsedBody = $this->parsedQuery;
         }
 
-        $this->parsedBody = $body;
-    }
-
-    /**
-     *
-     */
-    private function setParsedUrl()
-    {
-        if(!is_array($parsedUrl = parse_url($this->url))) {
-            $parsedUrl = [];
-        }
-
-        $this->parsedUrl = $parsedUrl;
+        return $parsedBody;
     }
 
     /**
@@ -153,26 +146,18 @@ class Request implements IRequest
     }
 
     /**
-     * @return string
+     * @return HTTPMethod
      */
-    public function getUrl(): string
+    public function getHTTPMethod(): HTTPMethod
+    {
+        return $this->HTTPMethod;
+    }
+
+    /**
+     * @return Url
+     */
+    public function getUrl(): Url
     {
         return $this->url;
-    }
-
-    /**
-     * @return array
-     */
-    public function getParsedUrl(): array
-    {
-        return $this->parsedUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMethod(): string
-    {
-        return $this->method;
     }
 }

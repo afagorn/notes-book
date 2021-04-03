@@ -2,7 +2,7 @@
 namespace core;
 
 use core\Request\IRequest;
-use System\Route\Route;
+use System\Route\Router;
 
 class App
 {
@@ -11,15 +11,25 @@ class App
      */
     private IRequest $request;
 
-    public function __construct(IRequest $request)
+    /**
+     * @var Router
+     */
+    private Router $route;
+
+    /**
+     * App constructor.
+     * @param IRequest $request
+     * @param Router $route
+     */
+    public function __construct(IRequest $request, Router $route)
     {
         $this->request = $request;
+        $this->route = $route;
     }
 
     public function run()
     {
         $this->request->init();
-
-        Route::run($this->request);
+        $this->route->run();
     }
 }

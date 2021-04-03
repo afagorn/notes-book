@@ -2,9 +2,14 @@
 
 namespace core\Request;
 
+use core\Route\HTTPMethod;
+
 interface IRequest
 {
-    public function init();
+    /**
+     * @return void
+     */
+    public function init(): void;
 
     /**
      * @return array
@@ -22,17 +27,12 @@ interface IRequest
     public function getParsedQuery(): array;
 
     /**
-     * @return string
+     * @return Url
      */
-    public function getUrl(): string;
+    public function getUrl(): Url;
 
     /**
-     * @return array
+     * @return HTTPMethod
      */
-    public function getParsedUrl(): array;
-
-    /**
-     * @return string
-     */
-    public function getMethod(): string;
+    public function getHTTPMethod(): HTTPMethod;
 }
